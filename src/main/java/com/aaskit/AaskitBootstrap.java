@@ -8,7 +8,7 @@ import static spark.Spark.*;
  */
 public class AaskitBootstrap {
     public static void main(String[] args) {
-        port(Integer.valueOf(8080));
+        port(Integer.valueOf(System.getenv("PORT")));
         staticFileLocation("/public");
 
         get("/message", (req, res) -> {return "Sri Haribol!";});
