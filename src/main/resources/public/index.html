@@ -3,8 +3,330 @@
 <head>
     <meta charset="UTF-8">
     <title>Aaskit</title>
+    <link rel="stylesheet" href="./node_modules/bootstrap/dist/css/bootstrap.css" />
+    <script src="./node_modules/jquery/dist/jquery.js"></script>
+    <script src="./node_modules/react/dist/react.js"></script>
+    <script src="./node_modules/react-dom/dist/react-dom.js"></script>
+    <script src="./node_modules/react-router/umd/ReactRouter.js"></script>
+    <script src="./node_modules/babel-standalone/babel.js"></script>
+    <style>
+      .App-header {
+        background-color: #222;
+        height: 90px;
+        padding: 5px;
+        color: white;
+      }
+      .img-responsive {
+        max-width: 90%;
+        height: 80px;
+      }
+      .vcenter {
+          transform: translateY(75%)
+      }
+      /*a:link, a:visited, a:hover, a:active {
+        text-decoration: none; color: #fff;
+      }*/
+    </style>
 </head>
 <body>
-    <h1>Welcome to aAskIt</h1>
+    <div id="app"></div>
+
+    <script type="text/babel">
+      const { Router, Route, IndexRoute, Redirect, Link,
+        IndexLink, browserHistory, hashHistory} = ReactRouter
+
+      var Navbar = React.createClass({
+        onJoinUs: function() {
+          console.log("Creating a new user...");
+          // browserHistory.push("user/new");
+        },
+
+        render: function() {
+          return (
+            <nav className="App-header navbar navbar-default">
+              <div className="container-fluid">
+                <div className="row">
+                  <div className="col-md-3">
+                    <img src="./amazetal.png" className="img-responsive"/>
+                  </div>
+                  <div className="col-md-3 col-md-offset-6 vcenter" >
+                    <button className="btn btn-large btn-default"><Link to="new-user">Join Us</Link></button>
+                    <button className="btn btn-large btn-success"><Link to="login"> Log In</Link></button>
+                    <Link to="about">   About Us</Link>
+                  </div>
+                </div>
+              </div>
+            </nav>
+          );
+        }
+      });
+
+      var Login = React.createClass({
+        render: function() {
+          return (<h1>Login form</h1>);
+        }
+      });
+
+      var About = React.createClass({
+        render: function() {
+          return (<div className="row">
+              <div className="col-md-12">
+                <h4 className="text-center">Best talent matcher</h4>
+              </div>
+            </div>);
+        }
+      });
+
+      var Admin = React.createClass({
+        render: function() {
+          return (
+            <div className="row">
+              <div className="col-md-4">
+                <div className="row">
+                  <div className="col-md-12">
+                    <Link to="admin/employer">Create Employer</Link>
+                  </div>
+                </div>
+                <div className="row">
+                  <div className="col-md-12">
+                    <Link to="admin/posting">Create Posting</Link>
+                  </div>
+                </div>
+              </div>
+              <div className="col-md-8">
+                {this.props.children}
+              </div>
+            </div>);
+        }
+      });
+
+      var UserCreationForm = React.createClass({
+        getInitialState: function() {
+          return ({email: "", password: ""});
+        },
+
+        handleEmail: function(e) {
+          e.preventDefault();
+          var email = e.target.value;
+          this.setState({email: email});
+        },
+
+        handlePassword: function(e) {
+          e.preventDefault();
+          var password = e.target.value;
+          this.setState({password: password});
+        },
+
+        onSubmit: function(e) {
+          e.preventDefault();
+          console.log("Submitting data: ", this.state);
+          $.ajax({
+            url: "/user",
+            dataType: "json",
+            type: "POST",
+            data: JSON.stringify(this.state),
+            success: function(data) {
+              console.log("Success!", data);
+            }.bind(this),
+            error: function(xhr, status, err) {
+              console.error(this.props.url, status, err.toString());
+            }.bind(this)
+          });
+        },
+
+        render: function() {
+          return (
+            <div className="row">
+              <div className="col-md-6 col-md-offset-3">
+                <h4 className="text-center">New User Signup Form</h4>
+                <form onSubmit={this.onSubmit}>
+                  <div className="form-group">
+                    <label htmlFor="email">Email Address</label>
+                    <input id="email" className="form-control" type="email" value={this.state.email} onChange={this.handleEmail} />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="password">Password</label>
+                    <input id="password" className="form-control" type="password" value={this.state.password} onChange={this.handlePassword} />
+                  </div>
+                  <button type="submit" className="btn btn-success">Sign Up</button>
+                </form>
+              </div>
+            </div>
+          );
+        }
+      });
+
+      var EmployerCreationForm = React.createClass({
+        getInitialState: function() {
+          return ({name: "", location: "", website: ""});
+        },
+
+        handleName: function(e) {
+          e.preventDefault();
+          var name = e.target.value;
+          this.setState({name: name});
+        },
+
+        handleLocation: function(e) {
+          e.preventDefault();
+          var location = e.target.value;
+          this.setState({location: location});
+        },
+
+        handleWebsite: function(e) {
+          e.preventDefault();
+          var website = e.target.value;
+          this.setState({website: website});
+        },
+
+        onSubmit: function(e) {
+          e.preventDefault();
+          console.log("Submitting data: ", this.state);
+          $.ajax({
+            url: "/admin/employer",
+            dataType: "json",
+            type: "POST",
+            data: JSON.stringify(this.state),
+            success: function(data) {
+              console.log("Success!", data);
+              this.setState({name: "", location: "", website: ""});
+            }.bind(this),
+            error: function(xhr, status, err) {
+              console.error(this.props.url, status, err.toString());
+            }.bind(this)
+          });
+        },
+
+        render: function() {
+          return (
+            <div className="row">
+              <div className="col-md-6 col-md-offset-3">
+                <h4 className="text-center">Create New Employer</h4>
+                <form onSubmit={this.onSubmit}>
+                  <div className="form-group">
+                    <label htmlFor="name">Employer Name</label>
+                    <input id="name" className="form-control" type="text" value={this.state.name} onChange={this.handleName} />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="location">Location</label>
+                    <input id="location" className="form-control" type="text" value={this.state.location} onChange={this.handleLocation} />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="website">Website</label>
+                    <input id="website" className="form-control" type="text" value={this.state.website} onChange={this.handleWebsite} />
+                  </div>
+                  <button type="submit" className="btn btn-success">Create</button>
+                </form>
+              </div>
+            </div>
+          );
+        }
+      });
+
+      var PostingCreationForm = React.createClass({
+        getInitialState: function() {
+          return ({employerId: "", location: "", jobDescription: "", primarySkills: ""});
+        },
+
+        handleEmployerId: function(e) {
+          e.preventDefault();
+          var employerId = e.target.value;
+          this.setState({employerId: employerId});
+        },
+
+        handleLocation: function(e) {
+          e.preventDefault();
+          var location = e.target.value;
+          this.setState({location: location});
+        },
+
+        handleJobDescription: function(e) {
+          e.preventDefault();
+          var jobDescription = e.target.value;
+          this.setState({jobDescription: jobDescription});
+        },
+
+        handlePrimarySkills: function(e) {
+          e.preventDefault();
+          var primarySkills = e.target.value;
+          this.setState({primarySkills: primarySkills});
+        },
+
+        onSubmit: function(e) {
+          e.preventDefault();
+          console.log("Submitting data: ", this.state);
+          $.ajax({
+            url: "/admin/posting",
+            dataType: "json",
+            type: "POST",
+            data: JSON.stringify(this.state),
+            success: function(data) {
+              console.log("Success!", data);
+              this.setState({employerId: "", location: "", jobDescription: "", primarySkills: ""});
+            }.bind(this),
+            error: function(xhr, status, err) {
+              console.error(this.props.url, status, err.toString());
+            }.bind(this)
+          });
+        },
+
+        render: function() {
+          return (
+            <div className="row">
+              <div className="col-md-6 col-md-offset-3">
+                <h4 className="text-center">Create New Posting</h4>
+                <form onSubmit={this.onSubmit}>
+                  <div className="form-group">
+                    <label htmlFor="employerId">Employer ID</label>
+                    <input id="employerId" className="form-control" type="number" value={this.state.employerId} onChange={this.handleEmployerId} />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="location">Location</label>
+                    <input id="location" className="form-control" type="text" value={this.state.location} onChange={this.handleLocation} />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="jobDescription">Job Description</label>
+                    <input id="jobDescription" className="form-control" type="text" value={this.state.jobDescription} onChange={this.handleJobDescription} />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="primarySkills">Primary Skills</label>
+                    <input id="primarySkills" className="form-control" type="text" value={this.state.primarySkills} onChange={this.handlePrimarySkills} />
+                  </div>
+                  <button type="submit" className="btn btn-success">Create</button>
+                </form>
+              </div>
+            </div>
+          );
+        }
+      });
+
+      var App = React.createClass({
+        contextTypes: {
+          router: React.PropTypes.object.isRequired
+        },
+        render: function() {
+            return (
+              <div>
+                <Navbar/>
+                {this.props.children}
+              </div>
+              );
+        }
+      });
+
+      ReactDOM.render(
+        <Router history={hashHistory}>
+          <Route path="/" component={App}>
+            <Route path="login" component={Login}/>
+            <Route path="about" component={About}/>
+            <Route path="new-user" component={UserCreationForm}/>
+            <Route path="admin" component={Admin}>
+              <Route path="employer" component={EmployerCreationForm}></Route>
+              <Route path="posting" component={PostingCreationForm}></Route>
+            </Route>
+          </Route>
+        </Router>,
+        document.getElementById("app"));
+    </script>
 </body>
 </html>
