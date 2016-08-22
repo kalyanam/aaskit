@@ -61,7 +61,8 @@ public class AaskitBootstrap {
 
         router.get().path("/*").handler(StaticHandler.create()
                 .setAllowRootFileSystemAccess(true)
-                .setWebRoot("/Users/mkalyan/dev/workspace/aaskit/src/main/resources/public")
+//                .setWebRoot("/Users/mkalyan/dev/workspace/aaskit/src/main/resources/public")
+                .setWebRoot("public")
                 .setCachingEnabled(false));
 
         Integer port = Integer.valueOf(System.getenv("PORT"));
