@@ -15,7 +15,7 @@ public class DAOFactory {
         this.template = template;
     }
 
-    public LoginDetailsDAO getUserDetailsDAO() {
+    public LoginDetailsDAO getLoginDetailsDAO() {
         return new LoginDetailsDAO(this.template);
     }
 

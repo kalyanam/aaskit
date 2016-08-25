@@ -3,8 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <title>Aaskit</title>
-    <link rel="stylesheet" href="./node_modules/bootstrap/dist/css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css"
+          href="https://fonts.googleapis.com/css?family=Roboto+Condensed">
+    <link rel="stylesheet" href="./node_modules/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="./node_modules/animate.css/animate.min.css" />
     <script src="./node_modules/jquery/dist/jquery.js"></script>
+    <script src="./node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
     <script src="./node_modules/react/dist/react.js"></script>
     <script src="./node_modules/react-dom/dist/react-dom.js"></script>
     <script src="./node_modules/react-router/umd/ReactRouter.js"></script>
@@ -23,13 +27,40 @@
       .vcenter {
           transform: translateY(75%)
       }
+
+      .carousel img {
+          min-width: 100%;
+          height: 480px;
+      }
+      .carousel-inner > .item > img {
+        height: 600px;
+      }
+      .carousel-control.left, .carousel-control.right {
+        background-image: none
+      }
       /*a:link, a:visited, a:hover, a:active {
         text-decoration: none; color: #fff;
       }*/
+      h1, h2, h3, h4, h5, h6 {
+          font-family: 'Roboto Condensed';
+      }
+      p, div {
+          font-family: 'Roboto Condensed';
+      }
+
+      .navbar {
+        margin-bottom: 0px;
+      }
+
+      #content {
+        background-color: #eee;
+      }
     </style>
 </head>
 <body>
-    <div id="app"></div>
+    <div id="wrap">
+      <div id="app"></div>
+    </div>
 
     <script type="text/babel">
       const { Router, Route, IndexRoute, Redirect, Link,
@@ -43,20 +74,25 @@
 
         render: function() {
           return (
-            <nav className="App-header navbar navbar-default">
-              <div className="container-fluid">
-                <div className="row">
-                  <div className="col-md-3">
-                    <img src="./amazetal.png" className="img-responsive"/>
+            <div className="row">
+              <div className="col-md-12">
+                <nav className="App-header navbar navbar-default">
+                  <div className="container-fluid">
+                    <div className="row">
+                      <div className="col-md-3">
+                        <a href="#"><img src="./amazetal.png" className="img-responsive"/></a>
+                      </div>
+                      <div className="col-md-3 col-md-offset-6 vcenter" >
+                        <button className="btn btn-large btn-default"><Link to="new-user">Join Us</Link></button>
+                        <button className="btn btn-large btn-success"><Link to="login"> Log In</Link></button>
+                        <Link to="about">   About Us</Link>
+                      </div>
+                    </div>
                   </div>
-                  <div className="col-md-3 col-md-offset-6 vcenter" >
-                    <button className="btn btn-large btn-default"><Link to="new-user">Join Us</Link></button>
-                    <button className="btn btn-large btn-success"><Link to="login"> Log In</Link></button>
-                    <Link to="about">   About Us</Link>
-                  </div>
-                </div>
+                </nav>
+
               </div>
-            </nav>
+            </div>
           );
         }
       });
@@ -81,22 +117,74 @@
         render: function() {
           return (
             <div className="row">
-              <div className="col-md-4">
-                <div className="row">
-                  <div className="col-md-12">
-                    <Link to="admin/employer">Create Employer</Link>
-                  </div>
-                </div>
-                <div className="row">
-                  <div className="col-md-12">
-                    <Link to="admin/posting">Create Posting</Link>
-                  </div>
-                </div>
+              <div className="col-md-2">
+                <ul className="nav nav-pills nav-stacked">
+                  <li role="presentation" className="active">
+                    <Link to="admin/employer">Employer</Link>
+                  </li>
+                  <li role="presentation" className="active">
+                    <Link to="admin/posting">Posting</Link>
+                  </li>
+                </ul>
               </div>
-              <div className="col-md-8">
+              <div className="col-md-10 bg-muted">
                 {this.props.children}
               </div>
             </div>);
+        }
+      });
+
+      var EmployersComponent = React.createClass({
+        getInitialState: function() {
+          return {employerData: []};
+        },
+
+        componentWillMount: function() {
+          $.ajax({
+            url: "http://localhost:5000/admin/employer",
+            dataType: "json",
+            type: "GET",
+            success: function(data) {
+              console.log("Data is: ", data);
+              this.setState({employerData: data});
+            }.bind(this),
+            error: function(xhr, status, err) {
+              console.error(this.props.url, status, err.toString());
+            }.bind(this)
+          });
+        },
+
+        render: function() {
+          var rows = this.state.employerData.map((employer,idx) => {
+            return (
+              <tr key={idx}>
+                <td>{employer.name}</td>
+                <td>{employer.location}</td>
+                <td>{employer.website}</td>
+                <td>{employer.is_active}</td>
+              </tr>
+            );
+          });
+          return (
+            <div className="row animated slideInRight">
+              <div className="col-md-8 col-md-offset-2">
+                <h3 className="text-center">Employer Information Within the System</h3>
+                <table className="table table-striped table-hover table-bordered">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Location</th>
+                      <th>Website</th>
+                      <th>Is Active</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {rows}
+                  </tbody>
+                </table>
+                <button className="btn btn-default"><Link to="admin/employer/new">Add New Employer</Link></button>
+              </div>
+          </div>);
         }
       });
 
@@ -136,7 +224,7 @@
 
         render: function() {
           return (
-            <div className="row">
+            <div className="row animated slideInUp">
               <div className="col-md-6 col-md-offset-3">
                 <h4 className="text-center">New User Signup Form</h4>
                 <form onSubmit={this.onSubmit}>
@@ -183,13 +271,14 @@
           e.preventDefault();
           console.log("Submitting data: ", this.state);
           $.ajax({
-            url: "/admin/employer",
+            url: "http://localhost:5000/admin/employer",
             dataType: "json",
             type: "POST",
             data: JSON.stringify(this.state),
             success: function(data) {
               console.log("Success!", data);
               this.setState({name: "", location: "", website: ""});
+              hashHistory.push("admin/employer");
             }.bind(this),
             error: function(xhr, status, err) {
               console.error(this.props.url, status, err.toString());
@@ -199,9 +288,9 @@
 
         render: function() {
           return (
-            <div className="row">
+            <div className="row animated slideInUp">
               <div className="col-md-6 col-md-offset-3">
-                <h4 className="text-center">Create New Employer</h4>
+                <h4 className="text-center">Add New Employer</h4>
                 <form onSubmit={this.onSubmit}>
                   <div className="form-group">
                     <label htmlFor="name">Employer Name</label>
@@ -215,7 +304,7 @@
                     <label htmlFor="website">Website</label>
                     <input id="website" className="form-control" type="text" value={this.state.website} onChange={this.handleWebsite} />
                   </div>
-                  <button type="submit" className="btn btn-success">Create</button>
+                  <button type="submit" className="btn btn-success">Add Employer</button>
                 </form>
               </div>
             </div>
@@ -272,7 +361,7 @@
 
         render: function() {
           return (
-            <div className="row">
+            <div className="row animated slideInUp">
               <div className="col-md-6 col-md-offset-3">
                 <h4 className="text-center">Create New Posting</h4>
                 <form onSubmit={this.onSubmit}>
@@ -300,6 +389,68 @@
         }
       });
 
+      var AmazetalLink = React.createClass({
+        componentDidMount: function(){
+          // $("#amazetal").load("http://www.amazetal.com #section-about-brooklyn");
+        },
+        render: function() {
+          console.log("amazetal: ", $("#amazetal").html("Something"));
+          return (
+            <div id="content">
+              <div className="row center-block animated slideInRight">
+                <div id="carousel-id" className="col-md-6 col-md-offset-3 carousel slide" data-ride="carousel">
+                  <ol className="carousel-indicators">
+                    <li data-target="#carousel-id" data-slide-to="0" className="active"></li>
+                    <li data-target="#carousel-id" data-slide-to="1"></li>
+                    <li data-target="#carousel-id" data-slide-to="2"></li>
+                  </ol>
+                  <div className="carousel-inner" role="listbox">
+                    <div className="item active">
+                      <img className="img-responsive" src="resources/folks1.jpg"/>
+                      <div className="carousel-caption">
+                        <h3>Job Seekers</h3>
+                        <p>Let Employers Find You For a Change</p>
+                      </div>
+                    </div>
+                    <div className="item">
+                      <img src="resources/folks2.jpg"/>
+                      <div className="carousel-caption">
+                        <h3>Employers</h3>
+                        <p>Let Us Find You Your People</p>
+                      </div>
+                    </div>
+                    <div className="item">
+                      <img src="resources/folks3.jpg"/>
+                      <div className="carousel-caption">
+                        <h3>Employers</h3>
+                        <p>Connect With Global Industry Leaders and Get Career Advice</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <a className="left carousel-control" role="button" data-slide="prev">
+                    <span className="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+                    <span className="sr-only">Previous</span>
+                  </a>
+                  <a className="right carousel-control" role="button" data-slide="next">
+                    <span className="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                    <span className="sr-only">Next</span>
+                  </a>
+                </div>
+              </div>
+              <div className="row center-block animated slideInUp">
+                <div className="col-md-6 col-md-offset-3 jumbotron">
+                  <h2 className="text-center">Tired of Searching for the Perfect Job?</h2>
+                  <h3 className="text-center">Join Us at AmazeTal</h3>
+                </div>
+
+              </div>
+            </div>
+
+          );
+        }
+      });
+
       var App = React.createClass({
         contextTypes: {
           router: React.PropTypes.object.isRequired
@@ -317,11 +468,13 @@
       ReactDOM.render(
         <Router history={hashHistory}>
           <Route path="/" component={App}>
+            <IndexRoute component={AmazetalLink}></IndexRoute>
             <Route path="login" component={Login}/>
             <Route path="about" component={About}/>
             <Route path="new-user" component={UserCreationForm}/>
             <Route path="admin" component={Admin}>
-              <Route path="employer" component={EmployerCreationForm}></Route>
+              <Route path="employer" component={EmployersComponent}></Route>
+              <Route path="employer/new" component={EmployerCreationForm}></Route>
               <Route path="posting" component={PostingCreationForm}></Route>
             </Route>
           </Route>

@@ -51,6 +51,7 @@ public class AaskitBootstrap {
 
         router.get().path("/message").handler(this::getMessage);
         router.post().path("/user").handler(this::createUser);
+        router.post().path("/login").handler(this::loginUser);
 
         //Admin APIs
         router.post().path("/admin/employer").handler(this::createEmployer);
@@ -77,6 +78,10 @@ public class AaskitBootstrap {
 
     private void createUser(RoutingContext routingContext) {
         new CreateNewUser(factory).handle(routingContext);
+    }
+
+    private void loginUser(RoutingContext routingContext) {
+        new LogUserIn(factory.getLoginDetailsDAO()).handle(routingContext);
     }
 
     private void createEmployer(RoutingContext routingContext) {

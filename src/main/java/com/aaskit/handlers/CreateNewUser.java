@@ -23,7 +23,7 @@ public class CreateNewUser {
         logger.info("Body is: {}", body);
         JsonObject jsonObject = new JsonObject(body);
 
-        factory.getUserDetailsDAO().createNewUser(jsonObject.getString("email"), jsonObject.getString("password"));
+        factory.getLoginDetailsDAO().createNewUser(jsonObject.getString("email"), jsonObject.getString("password"));
 
         routingContext.response().setStatusCode(HttpStatus.CREATED_201).end("{ \"status\": \"Success\" }");
     }
